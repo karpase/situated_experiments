@@ -15,10 +15,11 @@ maxnum = args.n
 random.seed(args.seed)
 
 free = [(0,0),(0,1),(1,0),(args.n-1,args.n-1)] # initial choice
-for x  in range(1,args.n):
-    for y in range(1, args.n):
-        if random.random() > args.p:
-            free.append((x,y))
+for x  in range(args.n):
+    for y in range(args.n):
+        if x > 1 or y > 1:
+            if random.random() > args.p:
+                free.append((x,y))
 init = (0,0)
 goal = (args.n-1,args.n-1)
 
