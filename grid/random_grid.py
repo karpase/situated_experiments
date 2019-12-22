@@ -1,29 +1,29 @@
 import sys
+import argparse
+import random
+
+parser = argparse.ArgumentParser(description='Generate random grid with 2 initial choices')
+parser.add_argument('n',  type=int,  help='size of grid',default=16)
+parser.add_argument('p',  type=float, help='probability of obstacle',default=0.2)
+parser.add_argument('pddl',  type=str, help='output file name')
+parser.add_argument('-seed',  type=int, help='random seed', default=2020)
 
 
-filename = sys.argv[1]
-pddl = sys.argv[2]
+args = parser.parse_args()
 
+maxnum = args.n
+random.seed(args.seed)
 
-maxnum = 0
-
-free = []
-init = ()
-goal = ()
-
-f = open(filename, "r")
-lines = f.readlines()
-for y,line in enumerate(lines):
-    maxnum = max(maxnum, 0, len(line))
-    for x,c in enumerate(line):
-        if c in [' ','A','B']:
+free = [(0,0),(0,1),(1,0),(args.n-1,args.n-1)] # initial choice
+for x  in range(1,args.n):
+    for y in range(1, args.n):
+        if random.random() > args.p:
             free.append((x,y))
-        if c == 'A':
-            init = (x,y)
-        if c == 'B':
-            goal = (x,y)
+init = (0,0)
+goal = (args.n-1,args.n-1)
 
-outfile = open(pddl, "w")
+
+outfile = open(args.pddl, "w")
 outfile.write("(define (problem grid1) (:domain grid)\n")
 outfile.write("(:objects \n")
 for i in range(maxnum):
@@ -32,6 +32,7 @@ for i in range(maxnum):
 outfile.write(")\n")
 outfile.write("(:init \n")
 outfile.write("(alive)\n")
+outfile.write("(at " + str(args.n * 4) + " (not (alive)))\n")
 for i in range(1,maxnum):
     outfile.write("(next n" + str(i-1) + " n" + str(i) + ") ")
 outfile.write("\n")
